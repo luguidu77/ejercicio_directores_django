@@ -21,7 +21,7 @@ const ContactList = () => {
 
         </div>
     );
-}
+} 
 
 export default ContactList;
  

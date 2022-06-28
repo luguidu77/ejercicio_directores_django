@@ -1,29 +1,38 @@
 import React, {useState} from 'react';
-import { useEffect } from 'react';
-import { LEVELS } from '../../models/levels.enum';
+
 import { Task } from '../../models/task.class';
+import { LEVELS } from '../../models/levels.enum';
 import TaskComponent from '../pure/task';
 
+// importamos la hoja de estilos de task.scss
+import '../../styles/task.scss'
 
-
+/* 
+  las los metodos y cambios de estados los definimos en el componente PADRE (task_list)
+  que pasamos al componente HIJO(task) desde llamaremos a los metodos o eventos
+*/
 const TaskListComponet = () => {
-   
-  const defaultTask = new Task('Example',' Default desciption', false, LEVELS.NORMAL)
-
-   const [defaultT, setdefaultT] = useState(defaultTask);
-
-  
+   const defaultTask = new Task('Antonio', 'hacer tareas', false, LEVELS.NORMAL)
  
-   const changeState= (  ) =>{
-    const newTask = defaultTask
-    newTask.completed = true
-    console.log(newTask);
-      setdefaultT( newTask )
-          
-   }
-
-
-
+   const [task, setdtask] = useState(defaultTask);
+   
+   const completaTarea= () =>{
+     
+        setdtask({
+           
+            ...task,
+            completed: !task.completed
+        })
+    }
+  
+    const cambiaNivel= () =>{
+     
+        setdtask({
+           
+            ...task,
+            level: LEVELS.BLOCKING
+        })
+    }
 
     return (
         <div>
@@ -36,11 +45,15 @@ const TaskListComponet = () => {
                     <TaskComponent key={task.name} task={task} />
 
                )) */
-                <TaskComponent  task={ defaultT } />
+                <TaskComponent task={ task }
+                completaTarea={completaTarea} 
+                cambiaNivel={cambiaNivel}
+                 
+                 />
 
               
             }
-             <button onClick={ changeState }> cambiar tarea</button>
+           
         </div>
     );
 };
