@@ -1,4 +1,4 @@
-
+/* 
 
 import 'package:agendacitas/screens/contacs_dialog.dart';
 import 'package:fast_contacts/fast_contacts.dart';
@@ -23,6 +23,7 @@ class CitaScreen extends StatefulWidget {
   CitaScreen({
     Key? key,
      this.cita,
+     
   }) : super(key: key);
 
   @override
@@ -74,8 +75,21 @@ class _CitaScreenState extends State<CitaScreen> {
   @override
   Widget build(BuildContext context) {
     
-    //TODO: servicioElegido trae {GEL: DataTime 1 h}
+    //TODO: servicioElegido trae {TIPO(gel,acrilico.., y tiempo de servicio, HORA, FECHA)}
      var servicioElegido =  Provider.of<CitaListProvider>(context);
+
+       var servicio = servicioElegido.servicioElegido['TIPO'];
+       myLogic.textControllerServicio.text = servicio;
+       var hora = servicioElegido.servicioElegido['HORA'];
+       myLogic.textControllerHora.text = hora;
+       DateFormat dateFormat = DateFormat("yyyy-MM-dd");
+       var fecha= dateFormat.format(servicioElegido.servicioElegido['FECHA']);
+       myLogic.textControllerDia.text = fecha;
+       DateFormat dateFormatHora = DateFormat("HH:mm");
+       var tiempo =dateFormatHora.format(servicioElegido.servicioElegido['TIEMPO']) ;
+       myLogic.textControllerTiempo.text = tiempo;
+
+
 
     return Scaffold(
       appBar: AppBar(
@@ -103,126 +117,128 @@ class _CitaScreenState extends State<CitaScreen> {
 
   Widget _form(servicioElegido) {
     return Container(
-        margin: new EdgeInsets.all(60.0),
+        margin: const EdgeInsets.all(30.0),
         child: Column(
           children: [
-            Text('Servicio: ${servicioElegido.servicioElegido.keys.first.toString()}'),
-            Column(children: [
-              /* DropdownButton(
-                items: _opcionTipo.map((String opc) {
-                  return DropdownMenuItem(
-                    value: opc,
-                    child: Text(opc),
-                  );
-                }).toList(),
-                onChanged: (_valorSeleccionado) async {
-                  setState(() {
-                    opcion.text = _valorSeleccionado.toString();
-                    _vistaManoPie = _valorSeleccionado.toString();
-                    myLogic.textControllerManosPies.text = opcion.text;
-                  });
-                },
-                //texto por defecto, si es nuevo escribe : TIPO DE VEHICULO (_vista)
-                hint: Text((myLogic.textControllerManosPies.text != '')
-                    ? myLogic.textControllerManosPies.text
-                    : _vistaManoPie),
-              ), */
-              Stack( alignment: Alignment(1.0,1.0),
-                children:[
-                  TextField(
-                     controller: myLogic.textControllerNombre,
-                     decoration: InputDecoration(labelText: 'Clienta'),
-                  ),
-                  TextButton(
-                    onPressed: ()=>_showContactList(context), 
-                    child: Icon(Icons.contact_phone_outlined) ,
-                                      
-                    )
+             Card(child: Padding(
+               padding: const EdgeInsets.all(8.0),
+               child: Column(children: [
+                    Stack( 
+                      children:[
+                        TextField(
+                          controller: myLogic.textControllerNombre,
+                          decoration: const InputDecoration(labelText: 'Clienta'),
+                         ),
+                         Row( 
+                           crossAxisAlignment: CrossAxisAlignment.end,
+                           mainAxisAlignment: MainAxisAlignment.end,
+                         children: [
+                                        
+                           TextButton( 
+                             onPressed: ()=>{}, 
+                             child: const Icon(Icons.favorite_border_outlined ),
+                             ),
+                            TextButton(
+                             onPressed: ()=>_showContactList(context), 
+                             child: const Icon(Icons.contact_phone_outlined) ,                
+                            ),
+                          ],)
+                         ] 
+                        ),
+                            TextField(
+                                  //!--------------------------------telefono
+                                  controller: myLogic.textControllerTelefono,
+                                  decoration: const InputDecoration(labelText: 'Teléfono'),
+                                ),
 
-                ] 
-              ),
-              TextField(
-                //!--------------------------------telefono
-                controller: myLogic.textControllerTelefono,
-                decoration: InputDecoration(labelText: 'Teléfono'),
-              ),
-              //!---------------------------------dia
-              TextField(
-                onChanged: (value) => setState(() {
-                  print(value);
-                }), //fechaSeleccionada = value,
+               ],),
+             ),),
+           
+            //!---------------------------------dia
+            
+            TextField(
+              enabled : false,
+              onChanged: (value) => setState(() {
+                print(value);
+              }), //fechaSeleccionada = value,
 
-                controller: myLogic.textControllerDia,
-                decoration: InputDecoration(labelText: 'Día'),
-              ),
-              //!---------------------------------hora
+              controller: myLogic.textControllerDia,
+              decoration: InputDecoration(labelText: 'Día'),
+            ),
+            //!---------------------------------hora
 
-              MaterialButton(
-                onPressed: () => funcionHorarios(context),
-                textColor: Colors.amber,
-                textTheme: ButtonTextTheme.accent,
-              ),
-              TextField(
-                controller: myLogic.textControllerHora,
-                decoration: InputDecoration(labelText: 'Hora'),
-              ),
-              //!---------------------------------ManosPies
-              TextField(
-                controller: myLogic.textControllerManosPies,
-                decoration: InputDecoration(labelText: 'Manos / Pies'),
-              ),
-              TextField(
-                controller: myLogic.textControllerServicio,
-                decoration: InputDecoration(labelText: 'Servicio'),
-              ),
-              TextField(
-                controller: myLogic.textControllerDetalle,
-                decoration: InputDecoration(labelText: 'Detalle'),
-              ),
-              SizedBox(
-                height: 50.0,
-              ),
-              ElevatedButton(
-                  child: (myLogic.cita.nombre != '')
-                      ? Text('Editar')
-                      : Text('Añadir'),
-                  onPressed: () {
-                    // Navigator.pushNamed(context, '/');
+            TextField(
+              enabled : false,
+              controller: myLogic.textControllerHora,
+              decoration: InputDecoration(labelText: 'Hora'),
+            ),
+           TextField(
+              controller: myLogic.textControllerServicio,
+              decoration: InputDecoration(labelText: 'Servicio'),
+            ),
+               TextField(
+              controller: myLogic.textControllerTiempo,
+              decoration: InputDecoration(labelText: 'Duración'),
+            ),
+            TextField(
+              controller: myLogic.textControllerPrecio,
+              decoration: InputDecoration(labelText: 'Precio'),
+            ),
+            TextField(
+              controller: myLogic.textControllerDetalle,
+              decoration: InputDecoration(labelText: 'Detalle'),
+            ),
+            SizedBox(
+              height: 50.0,
+            ),
+            ElevatedButton(
+                child: (myLogic.cita.nombre != '')
+                    ? Text('Editar')
+                    : Text('Añadir'),
+                onPressed: () {
+                  // Navigator.pushNamed(context, '/');
 
-                    (myLogic.cita.nombre != '')
-                        ? editar(
-                            context,
-                            myLogic.cita.id,
-                            myLogic.textControllerNombre.text,
-                            myLogic.textControllerTelefono.text,
-                            myLogic.textControllerDia.text,
-                            myLogic.textControllerHora.text,
-                            myLogic.textControllerManosPies.text,
-                            myLogic.textControllerServicio.text,
-                            myLogic.textControllerDetalle.text,
-                          )
-                        : nuevo(
-                            context,
-                            myLogic.textControllerNombre.text,
-                            myLogic.textControllerTelefono.text,
-                            myLogic.textControllerDia.text,
-                            myLogic.textControllerHora.text,
-                            myLogic.textControllerManosPies.text,
-                            myLogic.textControllerServicio.text,
-                            myLogic.textControllerDetalle.text,
-                          );
-                  })
-            ]),
+                  (myLogic.cita.nombre != '')
+                      ? editar(
+                          context,
+                          myLogic.cita.id,
+                          myLogic.textControllerNombre.text,
+                          myLogic.textControllerTelefono.text,
+                          myLogic.textControllerDia.text,
+                          myLogic.textControllerHora.text,
+                          myLogic.textControllerManosPies.text,
+                          myLogic.textControllerServicio.text,
+                          myLogic.textControllerPrecio.text,
+                          myLogic.textControllerDetalle.text,
+                        )
+                      : nuevo(
+                          context,
+                          myLogic.textControllerNombre.text,
+                          myLogic.textControllerTelefono.text,
+                          myLogic.textControllerDia.text,
+                          myLogic.textControllerHora.text,
+                          myLogic.textControllerManosPies.text,
+                          myLogic.textControllerServicio.text,
+                           myLogic.textControllerTiempo.text,
+                          myLogic.textControllerPrecio.text,
+                          myLogic.textControllerDetalle.text,
+                        );
+                }),
           ],
         ));
   }
 
   nuevo(BuildContext context, String nombre, String telefono, String dia,
-      String hora, String manospies, String servicio, String detalle) async {
+      String hora, String manospies, String servicio, String tiempo, String precio, String detalle) async {
     final citaListProvider =
         Provider.of<CitaListProvider>(context, listen: false);
     citaListProvider.nuevaCita(
-        nombre, telefono, dia, hora, manospies, servicio, detalle);
+        nombre, telefono, dia, hora, manospies, servicio, tiempo, precio, detalle);
+
+    final snackBar = SnackBar(content: Text('CITA CREADA CORRECTAMENTE'));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    
+    Navigator.pushNamed(context, '/');
   }
 
   editar(
@@ -234,6 +250,7 @@ class _CitaScreenState extends State<CitaScreen> {
       String hora,
       String manospies,
       String servicio,
+      String precio,
       String detalle) {}
 
 //? SELECCIONAR HORA
@@ -251,12 +268,12 @@ class _CitaScreenState extends State<CitaScreen> {
     );
   }
 
-  _showContactList(BuildContext context) {
+  _showContactList(BuildContext context) async {
 
     List<Contact> favoriteElements = [];
     final InputDecoration searchDecoration = const InputDecoration();
 
-    refreshContacts();
+    await refreshContacts();
     
     if (_contacts != null)
     {
@@ -346,45 +363,18 @@ class _CitaScreenState extends State<CitaScreen> {
 
 
 
-//! inicializa cita
+// inicializa cita
 final cita = CitaModel(
   nombre: "",
-  telefono: '5656565656',
+  telefono: '',
   dia: DateFormat("yyyy-MM-dd").format(DateTime.now()),
   hora: "10:00",
-  manospies: "manos",
-  icono: 'icono.jpg',
   servicio: "acrilico",
+  precio: '',
   detalle: 'otros comentarios',
 );
 
 
 
 
-//TODO: verTodasCitas es eventual de pruebas
-
-/* Widget verTodasCitas(context, citasprovider) {
-  return FutureBuilder(
-      future: citasprovider.cargarCitas(),
-      builder: (context, snapshot) {
-        List<CitaModel> citas = snapshot.data as List<CitaModel>;
-
-        if (snapshot.hasData) Center(child: CircularProgressIndicator());
-
-        if (snapshot.hasData) {
-          return ListView.builder(
-              itemCount: citas.length,
-              itemBuilder: (BuildContext context, int index) {
-                return ListTile(
-                    leading: Text(citas[index].manospies.toString()),
-                    trailing: Text(
-                      citas[index].id.toString(),
-                      style: TextStyle(color: Colors.green, fontSize: 15),
-                    ),
-                    title: Text("Clienta: ${citas[index].nombre}"));
-              });
-        } else {
-          return Text('sin datos');
-        }
-      });
-} */
+ */

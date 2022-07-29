@@ -1,83 +1,66 @@
 import 'package:agendacitas/models/cita_model.dart';
+import 'package:agendacitas/providers/cita_list_provider.dart';
 import 'package:flutter/material.dart';
 
-
-/*  id INTEGER PRIMARY KEY,
-           nombre TEXT,
-           telefono TEXT,
-           dia TEXT,
-           hora TEXT,
-           manospies TEXT,
-           icono TEXT,
-           servicio TEXT,
-           detalle TEXT,
-           id_Servicio TEXT */
-
-class MyDetailLogic{
-  MyDetailLogic(this.cita);
+class MyLogicCita {
+  MyLogicCita(this.cita);
   final CitaModel cita;
 
+  var citaContext = CitaListProvider().getCitaElegida;
+
+  final textControllerDia = TextEditingController();
+  final textControllerHora = TextEditingController();
+
+  void save() {}
+
+  void init() {
+    if (cita.hashCode.isNaN) {
+      textControllerDia.text = cita.dia.toString();
+      textControllerHora.text = cita.horaInicio.toString();
+      textControllerHora.text = cita.horaFinal.toString();
+    }
+  }
+}
+
+class MyLogicCliente {
+  MyLogicCliente(this.cliente);
+  final ClienteModel cliente;
 
   final textControllerNombre = TextEditingController();
   final textControllerTelefono = TextEditingController();
-  final textControllerDia = TextEditingController();
-  final textControllerHora= TextEditingController();
-  final textControllerManosPies = TextEditingController();
-  final textControllerIcono = TextEditingController();
-  final textControllerServicio= TextEditingController();
-  final textControllerDetalle= TextEditingController();
- 
- void save(){
-  
- }
-  
- void init() {
-    if ( cita !=null){
-        textControllerNombre.text=   cita.nombre.toString();
-        textControllerTelefono.text= cita.telefono.toString();
-        textControllerDia.text=      cita.dia.toString();
-        textControllerHora.text=     cita.hora.toString();
-        textControllerManosPies.text=cita.manospies.toString();
-        textControllerServicio.text=cita.servicio.toString();
-        textControllerDetalle.text=  cita.detalle.toString();
+
+  void save() {}
+
+  void init() {
+    if (cliente != null) {
+      textControllerNombre.text = cliente.nombre.toString();
+      textControllerTelefono.text = cliente.telefono.toString();
     }
-  }    
+  }
 }
 
-//TODO: cumplimentar para servicios de uñas
-//-------------------------------------------------------
-// logic servivios
-// 
-/*  
-class MyDetailLogicServicio{
-  MyDetailLogicServicio(this.servicio);
-  final ServiceModel servicio;
+class MyLogicServicio {
+  MyLogicServicio(this.servicio);
+  final ServicioModel servicio;
 
-  final textControllerFecha = TextEditingController();
-  final textControllerOdometro= TextEditingController();
-  final textControllerTarea = TextEditingController();
-  final textControllerTaller= TextEditingController();
-  final textControllerCoste= TextEditingController();
-  final textControllerNota = TextEditingController();
-  final textControllerArchivo= TextEditingController();
- 
- void save(){
-   
- }
- 
+  final textControllerPrecio = TextEditingController();
+  final textControllerServicio = TextEditingController();
+  final textControllerTiempo = TextEditingController();
+  final textControllerDetalle = TextEditingController();
 
- void init() {
-    if ( servicio !=null){
-        textControllerFecha.text   = servicio.fecha;
-        textControllerOdometro.text= servicio.odometro;
-        textControllerTarea.text   = servicio.tarea;
-        textControllerTaller.text  = servicio.taller;
-        textControllerCoste.text  = servicio.coste.toString();
-        textControllerNota.text    = servicio.nota;
-        textControllerArchivo.text = servicio.archivo;
+  void save() {}
+
+  void init() {
+    if (servicio != null) {
+      textControllerPrecio.text = servicio.precio.toString();
+      textControllerServicio.text = servicio.servicio.toString();
+      textControllerTiempo.text = servicio.tiempo.toString();
+      textControllerDetalle.text = servicio.detalle.toString();
     }
-  }    
+  }
 }
+
+/*
 
 class MyDetailLogicRecordatorio{
   MyDetailLogicRecordatorio(this.recordatorio);

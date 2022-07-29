@@ -31,28 +31,34 @@ class DBProvider {
     WidgetsFlutterBinding.ensureInitialized();
 
     //crear base de datos
-    return await openDatabase(path, version: 2, onOpen: (db) {},
-        onCreate: (Database db, int version) async {
+    return await openDatabase(path, version: 1, onOpen: (db) {},
+        onConfigure: (db) async {
+      await db.execute('PRAGMA foreign_keys = ON');
+    }, onCreate: (Database db, int version) async {
       await db.execute('''
          CREATE TABLE Cita(
            id INTEGER PRIMARY KEY,
-           nombre TEXT,
-           telefono TEXT,
            dia TEXT,
-           hora TEXT,
-           manospies TEXT,
-           icono TEXT,
-           servicio TEXT,
-           detalle TEXT,
-           id_Servicio TEXT
-         )         
+           horainicio TEXT,
+           horafinal TEXT,
+           comentario TEXT,
+           id_cliente,
+           id_servicio
+          )         
+        ''');
+      await db.execute('''
+         CREATE TABLE Cliente(
+           id INTEGER PRIMARY KEY,
+           nombre TEXT,
+           telefono TEXT 
+          )         
         ''');
       await db.execute('''
          CREATE TABLE Servicio(
            id INTEGER PRIMARY KEY,
            servicio TEXT,
-           manospies TEXT,
-           icono DOUBLE,
+           tiempo TEXT,
+           precio INTEGER,
            detalle TEXT
          )         
         ''');
@@ -77,10 +83,28 @@ class DBProvider {
     });
   }
 
+  Future<int> nuevoCliente(ClienteModel nuevoCliente) async {
+    // Verifica la base de datos
+    final db = await database;
+    final res = await db!.insert('Cliente', nuevoCliente.toJson());
+
+    // RES Es el ID del último registro guardado
+    return res;
+  }
+
   Future<int> nuevaCita(CitaModel nuevaCita) async {
     // Verifica la base de datos
     final db = await database;
     final res = await db!.insert('Cita', nuevaCita.toJson());
+
+    // RES Es el ID del último registro guardado
+    return res;
+  }
+
+  Future<int> nuevoServicio(ServicioModel nuevoServicio) async {
+    // Verifica la base de datos
+    final db = await database;
+    final res = await db!.insert('Servicio', nuevoServicio.toJson());
 
     // RES Es el ID del último registro guardado
     return res;
@@ -92,6 +116,22 @@ class DBProvider {
     return res.isNotEmpty ? res.map((s) => CitaModel.fromJson(s)).toList() : [];
   }
 
+  Future<List<ClienteModel>> getTodosLosClientes() async {
+    final db = await database;
+    final res = await db!.query('Cliente');
+    return res.isNotEmpty
+        ? res.map((s) => ClienteModel.fromJson(s)).toList()
+        : [];
+  }
+
+  Future<List<ServicioModel>> getTodoslosServicios() async {
+    final db = await database;
+    final res = await db!.query('Servicio');
+    return res.isNotEmpty
+        ? res.map((s) => ServicioModel.fromJson(s)).toList()
+        : [];
+  }
+
   Future<List<CitaModel>> getCitasHoraOrdenadaPorFecha(String fecha) async {
     final db = await database;
     final res = await db!.rawQuery("select * from Cita where dia='$fecha'");
@@ -99,7 +139,41 @@ class DBProvider {
     return res.isNotEmpty ? res.map((s) => CitaModel.fromJson(s)).toList() : [];
   }
 
-  Future<List<CitaModel>> getCitasHoraOrdenada() async {
+  Future<ClienteModel> getCientePorId(int id) async {
+    final db = await database;
+    final res = await db!.query(
+      "Cliente",
+      where: 'id = $id',
+    );
+    return  ClienteModel.fromJson(res.first) ;
+    /* return res.isNotEmpty
+        ? res.map((s) => ClienteModel.fromJson(s)).toList()
+        : []; */
+  }
+  Future<ServicioModel> getServicioPorId(int id) async {
+    final db = await database;
+    final res = await db!.query(
+      "Servicio",
+      where: 'id = $id',
+    );
+    return  ServicioModel.fromJson(res.first) ;
+    /* return res.isNotEmpty
+        ? res.map((s) => ClienteModel.fromJson(s)).toList()
+        : []; */
+  }
+
+  Future<List<ClienteModel>> getCientePorTelefono(String telefono) async {
+    final db = await database;
+    final res = await db!.query(
+      "Cliente",
+      where: 'telefono = $telefono',
+    );
+
+    return res.isNotEmpty
+        ? res.map((s) => ClienteModel.fromJson(s)).toList()
+        : [];
+  }
+/*   Future<List<CitaModel>> getCitasHoraOrdenada() async {
     final db = await database;
     final res = await db!.query(
       'Cita',
@@ -107,5 +181,15 @@ class DBProvider {
     );
 
     return res.isNotEmpty ? res.map((s) => CitaModel.fromJson(s)).toList() : [];
+  } */
+
+  eliminarCita(int id) async {
+    final db = await database;
+
+    final res = await db!.delete(
+      'Cita',
+      where: 'id = $id',
+    );
+    return res;
   }
 }

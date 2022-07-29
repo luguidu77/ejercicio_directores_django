@@ -9,20 +9,40 @@ class CitaListProvider extends ChangeNotifier {
   bool _cargando = false;
   int _tarjetaPage = 0;
 
+  List<ClienteModel> clientes = [];
   List<CitaModel> citas = [];
+  List<ServicioModel> servicios = [];
   String tipoSeleccionado = 'MANO';
 
-  Future<CitaModel> nuevaCita(String nombre, String telefono, String dia,
-      String hora, String manospies, String servicio, String detalle) async {
-    final nuevaCita = new CitaModel(
+  Future<ClienteModel> nuevoCliente(
+    String nombre,
+    String telefono,
+  ) async {
+    final nuevoCliente = new ClienteModel(
       nombre: nombre.toUpperCase(),
       telefono: telefono,
-      dia: dia,
-      hora: hora,
-      manospies: manospies,
-      servicio: servicio.toUpperCase(),
-      detalle: detalle.toUpperCase(),
     );
+
+    final id = await DBProvider.db.nuevoCliente(nuevoCliente);
+
+    //asinar el ID de la base de datos al modelo
+    nuevoCliente.id = id;
+
+    clientes.add(nuevoCliente);
+    notifyListeners();
+
+    return nuevoCliente;
+  }
+
+  Future<CitaModel> nuevaCita(String dia, String horaInicio, String horaFinal,
+      String comentario, int idCliente, int idServicio) async {
+    final nuevaCita = new CitaModel(
+        dia: dia,
+        horaInicio: horaInicio,
+        horaFinal: horaFinal,
+        comentario: comentario,
+        idcliente: idCliente,
+        idservicio: idServicio);
 
     final id = await DBProvider.db.nuevaCita(nuevaCita);
 
@@ -35,23 +55,25 @@ class CitaListProvider extends ChangeNotifier {
     return nuevaCita;
   }
 
-  /*   editarCar(id, String tipo, String marca, String modelo, String matricula, String fmatriculacion, String bastidor) async {
-       final editaCar = new CitaModel(
-         id: id,
-         nombre:nombre.toUpperCase(),
-         matricula: matricula.toUpperCase(),
-         marca:marca.toUpperCase(),
-         modelo: modelo.toUpperCase(),
-         fmatriculacion:fmatriculacion,
-         bastidor: bastidor         .toUpperCase()
-         );
+  Future<ServicioModel> nuevoServicio(
+      String servicio, String tiempo, int precio, String detalle) async {
+    final nuevoServicio = new ServicioModel(
+      servicio: servicio,
+      tiempo: tiempo,
+      precio: precio,
+      detalle: detalle,
+    );
 
-        editaCar.id = id;
-        await DBProvider.db.updateCar(editaCar);
-        this.cars = [...cars];
-     
-    }
-     */
+    final id = await DBProvider.db.nuevoServicio(nuevoServicio);
+
+    //asinar el ID de la base de datos al modelo
+    nuevoServicio.id = id;
+
+    servicios.add(nuevoServicio);
+    notifyListeners();
+
+    return nuevoServicio;
+  }
 
   cargarCitas() async {
     final citas = await DBProvider.db.getTodasLasCitas();
@@ -60,15 +82,75 @@ class CitaListProvider extends ChangeNotifier {
     return citas;
   }
 
-  cargarCitasPorFecha(String fecha) async {
-    final citas = await DBProvider.db.getCitasHoraOrdenadaPorFecha(fecha);
-    this.citas = [...citas];
+  List<Map<String,dynamic>> data = [];
 
+  // List<ClienteModel> cientes = [];
+  ClienteModel _cliente = ClienteModel();
+  ServicioModel _servicio = ServicioModel();
+
+  cargarCitasPorFecha(String fecha) async {
+    List<CitaModel> citas =
+        await DBProvider.db.getCitasHoraOrdenadaPorFecha(fecha);
+
+    for (var item in citas) {
+      _cliente = await DBProvider.db.getCientePorId(item.idcliente!);
+      _servicio = await DBProvider.db.getServicioPorId(item.idservicio! + 1);
+
+      data.add({
+        'horaInicio': item.horaInicio,
+        'horaFinal': item.horaFinal,
+        'nombre': _cliente.nombre,
+        'servicio': _servicio.servicio,
+        'precio': _servicio.precio,
+        'detalle': _servicio.detalle
+      });
+    }
+
+    //  this.data = [...data];
+    //print(data.toString());
+
+    notifyListeners();
+
+    return data;
+  }
+
+  cargarServicios() async {
+    final servicios = await DBProvider.db.getTodoslosServicios();
+    this.servicios = [...servicios];
+    notifyListeners();
+    return servicios;
+  }
+
+  cargarClientes() async {
+    final clientes = await DBProvider.db.getTodosLosClientes();
+    this.clientes = [...clientes];
+    notifyListeners();
+    return clientes;
+  }
+
+/*   Future<List<ClienteModel>> cargarClientePorCita(int idCita) async {
+    final clientes = await DBProvider.db.getCientePorId(idCita);
+    this.clientes = [...clientes];
     // this.tipoSeleccionado = fecha;
     notifyListeners();
 
-    return citas;
+    return clientes;
+  } */
+
+  cargarClientePorTelefono(String telefono) async {
+    //todo: quitar el + y espacios del nuemero de telefono porque no lo encuentra
+    final clientes = await DBProvider.db.getCientePorTelefono(telefono);
+    this.clientes = [...clientes];
+    // this.tipoSeleccionado = fecha;
+    notifyListeners();
+
+    return clientes;
   }
+
+  elimarCita(int id) async {
+    await DBProvider.db.eliminarCita(id);
+  }
+
   /*
     borrarTodos() async {
       await DBProvider.db.deleteAllCars();
@@ -82,20 +164,47 @@ class CitaListProvider extends ChangeNotifier {
     }
  */
 
-  //TODO: tengo que hacerlo dinamico y guardar en DB
-  final servicios = {
-    'GEL': DateTime(2022, 1, 1, 1, 00, 00), //servicio 1 gel 1h
-    'ACRILICO': DateTime(2022, 1, 1, 2, 00, 00), //servicio 2 agrilico 2h
+//! CONTEXTO clientaElegida
+  Map<String, dynamic> _clientaElegida = {
+    'ID': 0,
+    'NOMBRE': '',
+    'TELEFONO': '',
   };
 
-   Map<String, DateTime> _servicioElegido = {};
+  Map<String, dynamic> get getClientaElegida => _clientaElegida;
 
-   Map<String, DateTime> get servicioElegido => _servicioElegido;
+  set setClientaElegida(Map<String, dynamic> nuevoCliente) {
+    _clientaElegida = nuevoCliente;
+    notifyListeners();
+  }
 
-   set servicioElegido(Map<String, DateTime> nuevoServicio){
+//! CONTEXTO servicioElegido
+  Map<String, dynamic> _servicioElegido = {
+    'ID': 0,
+    'SERVICIO': '',
+    'TIEMPO': '',
+    'PRECIO': '',
+    'DETALLE': '',
+  };
+
+  Map<String, dynamic> get getServicioElegido => _servicioElegido;
+
+  set setServicioElegido(Map<String, dynamic> nuevoServicio) {
     _servicioElegido = nuevoServicio;
     notifyListeners();
+  }
 
-   } 
+  //! CONTEXTO citaElegida
+  Map<String, dynamic> _citaElegida = {
+    'FECHA': '',
+    'HORAINICIO': '',
+    'HORAFINAL': '',
+  };
 
+  Map<String, dynamic> get getCitaElegida => _citaElegida;
+
+  set setCitaElegida(Map<String, dynamic> nuevaCita) {
+    _citaElegida = nuevaCita;
+    notifyListeners();
+  }
 }
