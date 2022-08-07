@@ -145,18 +145,19 @@ class DBProvider {
       "Cliente",
       where: 'id = $id',
     );
-    return  ClienteModel.fromJson(res.first) ;
+    return ClienteModel.fromJson(res.first);
     /* return res.isNotEmpty
         ? res.map((s) => ClienteModel.fromJson(s)).toList()
         : []; */
   }
+
   Future<ServicioModel> getServicioPorId(int id) async {
     final db = await database;
     final res = await db!.query(
       "Servicio",
       where: 'id = $id',
     );
-    return  ServicioModel.fromJson(res.first) ;
+    return ServicioModel.fromJson(res.first);
     /* return res.isNotEmpty
         ? res.map((s) => ClienteModel.fromJson(s)).toList()
         : []; */
@@ -188,6 +189,16 @@ class DBProvider {
 
     final res = await db!.delete(
       'Cita',
+      where: 'id = $id',
+    );
+    return res;
+  }
+
+  eliminarServicio(int id) async {
+    final db = await database;
+
+    final res = await db!.delete(
+      'Servicio',
       where: 'id = $id',
     );
     return res;

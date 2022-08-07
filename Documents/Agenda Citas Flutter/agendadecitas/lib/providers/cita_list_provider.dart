@@ -82,7 +82,7 @@ class CitaListProvider extends ChangeNotifier {
     return citas;
   }
 
-  List<Map<String,dynamic>> data = [];
+  List<Map<String, dynamic>> data = [];
 
   // List<ClienteModel> cientes = [];
   ClienteModel _cliente = ClienteModel();
@@ -97,6 +97,7 @@ class CitaListProvider extends ChangeNotifier {
       _servicio = await DBProvider.db.getServicioPorId(item.idservicio! + 1);
 
       data.add({
+        'id': item.id,
         'horaInicio': item.horaInicio,
         'horaFinal': item.horaFinal,
         'nombre': _cliente.nombre,
@@ -108,6 +109,33 @@ class CitaListProvider extends ChangeNotifier {
 
     //  this.data = [...data];
     //print(data.toString());
+
+    notifyListeners();
+
+    return data;
+  }
+
+  cargarCitasAnual(String fecha) async {
+    var anual = fecha.split('-')[0]; //año de fecha buscada
+  
+    List<CitaModel> citas = await DBProvider.db.getTodasLasCitas();
+
+    for (var item in citas) {
+      String _fecha = item.dia.toString(); // todos los dias
+        // si la fecha anul coincide con el año de las citas, trae sus servicios para rescatar el precio
+      if (_fecha.split('-')[0] == anual) {
+        _servicio = await DBProvider.db.getServicioPorId(item.idservicio! + 1);
+
+        data.add({
+          'id': item.id,
+          'fecha': _fecha,
+          'precio': _servicio.precio,
+        });
+      }
+    }
+
+    //  this.data = [...data];
+    print(data.toString());
 
     notifyListeners();
 
@@ -149,6 +177,10 @@ class CitaListProvider extends ChangeNotifier {
 
   elimarCita(int id) async {
     await DBProvider.db.eliminarCita(id);
+  }
+
+  elimarServicio(int id) async {
+    await DBProvider.db.eliminarServicio(id);
   }
 
   /*

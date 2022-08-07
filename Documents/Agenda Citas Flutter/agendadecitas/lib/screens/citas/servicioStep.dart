@@ -1,6 +1,9 @@
 import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/providers/cita_list_provider.dart';
 import 'package:agendacitas/providers/my_detail_logic.dart';
+import 'package:agendacitas/screens/citas/citaStep.dart';
+import 'package:agendacitas/utils/transicion_ruta.dart';
+import 'package:agendacitas/widgets/barra_progreso.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -53,14 +56,14 @@ class _ServicioStepState extends State<ServicioStep> {
     var servicio = servicioElegido.getServicioElegido;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Creación de Cita'),
-      ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.arrow_right_outlined),
         onPressed: () async => {
           if (_formKey.currentState!.validate())
-            {Navigator.pushNamed(context, 'citaStep')}
+            {
+              Navigator.of(context)
+                  .push(MyTransicionRuta().createRoute(CitaStep()))
+            }
           //await seleccionaServicio(context),
         },
       ),
@@ -70,9 +73,12 @@ class _ServicioStepState extends State<ServicioStep> {
           key: _formKey,
           child: Column(
             children: [
-              Text(servicio.toString()),
-
-              //? LISTA DE SERVICIOS
+              // Text(servicio.toString()),
+              BarraProgreso().progreso(
+                0.66,
+                Colors.amber,
+              ),
+              const SizedBox(height: 50),
               listaServicios(context),
               const SizedBox(height: 50),
               precioServicio(servicio),
@@ -83,39 +89,38 @@ class _ServicioStepState extends State<ServicioStep> {
     );
   }
 
-  Container listaServicios(context) {
-    return Container(
-      width: 300,
-      height: 80,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5.0),
-          border: Border.all(color: Colors.blue)),
-      child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: DropdownButtonFormField(
-            decoration: const InputDecoration(
-                border: UnderlineInputBorder(borderSide: BorderSide.none)),
-            //opcion color para cambio tema: iconEnabledColor: Colors.amber,
-            hint: const Text('ELIGE UN SERVICIO'),
+  Widget listaServicios(BuildContext context) {
+    return Center(
+      child: Container(
+        width: 300,
+        height: 80,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5.0),
+            border: Border.all(color: Colors.blue)),
+        child: DropdownButtonFormField(
+          decoration: const InputDecoration(
+              border: UnderlineInputBorder(borderSide: BorderSide.none)),
+          //opcion color para cambio tema: iconEnabledColor: Colors.amber,
+          hint: const Text('ELIGE UN SERVICIO'),
 
-            validator: (value) =>
-                value == null ? 'Seleciona un servicio' : null,
-            items: listNombreServicios
-                .map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
-            onChanged: (String? newValue) {
-              setState(() {
-                dropdownValue = newValue!;
-                int index = listNombreServicios.indexOf(dropdownValue);
-                seleccionaServicio(context, index);
-                indexServicio = index;
-              });
-            },
-          )),
+          validator: (value) => value == null ? 'Seleciona un servicio' : null,
+          items:
+              listNombreServicios.map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value),
+            );
+          }).toList(),
+          onChanged: (String? newValue) {
+            setState(() {
+              dropdownValue = newValue!;
+              int index = listNombreServicios.indexOf(dropdownValue);
+              seleccionaServicio(context, index);
+              indexServicio = index;
+            });
+          },
+        ),
+      ),
     );
   }
 

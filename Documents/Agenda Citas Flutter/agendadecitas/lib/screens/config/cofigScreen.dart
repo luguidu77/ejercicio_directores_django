@@ -40,6 +40,10 @@ class _ConfigScreenState extends State<ConfigScreen> {
   }
 
   _formulario(context) {
+    List iconos = const [
+      Icon(Icons.design_services_outlined),
+      Icon(Icons.cleaning_services_sharp)
+    ];
     List listaConfiguraciones = ['Tema', 'Servicios'];
 
     return Column(
@@ -49,6 +53,7 @@ class _ConfigScreenState extends State<ConfigScreen> {
               itemCount: listaConfiguraciones.length,
               itemBuilder: (context, index) {
                 return ListTile(
+                  leading: iconos[index],
                   title: GestureDetector(
                       onTap: () => Navigator.pushNamed(
                           context, '${listaConfiguraciones[index]}'),

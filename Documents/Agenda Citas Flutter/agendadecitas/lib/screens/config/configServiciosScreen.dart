@@ -70,7 +70,6 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
                     const InputDecoration(labelText: 'Tiempo de servicio'),
               ),
               TextButton.icon(
-                  
                   onPressed: () => _selectTime(),
                   icon: const Icon(Icons.timer_sharp),
                   label: const Text(''))
@@ -108,6 +107,6 @@ class _ConfigServiciosScreenState extends State<ConfigServiciosScreen> {
 
     CitaListProvider().nuevoServicio(servicio, tiempo, precio, detalle);
 
-    Navigator.pushNamed(context, '/');
+    Navigator.pushReplacementNamed(context, 'Servicios');
   }
 }

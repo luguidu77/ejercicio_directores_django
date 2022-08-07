@@ -1,6 +1,11 @@
+import 'package:agendacitas/providers/theme_provider.dart';
 import 'package:agendacitas/screens/calendarioScreen.dart';
 import 'package:agendacitas/screens/cientesScreen.dart';
+import 'package:agendacitas/screens/config/temaScreen.dart';
+import 'package:agendacitas/screens/informesScreen.dart';
+import 'package:agendacitas/screens/serviciosScreen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'citas/citaStep.dart';
 import 'citas/clientaStep.dart';
@@ -18,15 +23,45 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(title: _title, home: MyStatefulWidget(), routes: {
-      'clientaStep': (BuildContext context) => ClientaStep(),
-      'servicioStep': (BuildContext context) => ServicioStep(),
-      'citaStep': (BuildContext context) => CitaStep(),
-      'confirmarStep': (BuildContext context) => ConfirmarStep(),
-      'configScreen': (BuildContext context) => ConfigScreen(),
-      'Servicios': (BuildContext context) => ConfigServiciosScreen(),
-      'clientesScreen': (_) => ClientesScreen(),
-    });
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: _title,
+      themeMode: themeProvider.themeMode,
+      theme: MyTheme.lightTheme,
+      darkTheme: MyTheme.darkTheme,
+      home: const MyStatefulWidget(),
+      routes: {
+        'clientaStep': (BuildContext context) => ClientaStep(),
+        'servicioStep': (BuildContext context) => ServicioStep(),
+        'citaStep': (BuildContext context) => CitaStep(),
+        'confirmarStep': (BuildContext context) => ConfirmarStep(),
+        'configScreen': (BuildContext context) => ConfigScreen(),
+        'clientesScreen': (_) => ClientesScreen(),
+        'calendarioScreen': (BuildContext context) => CalendarioCitasScreen(),
+        'Tema': (BuildContext context) => TemaScreen(),
+        'configServicios': (BuildContext context) => ConfigServiciosScreen(),
+        'Servicios': (_) => ServiciosScreen(),
+        'informesScreen': (_) => InformesScreen(),
+      },
+      /*  ThemeData(
+        // Define the default brightness and colors.
+        brightness: Brightness.dark,
+        primaryColor: Colors.lightBlue[800],
+
+        // Define the default font family.
+        fontFamily: 'Georgia',
+
+        // Define the default `TextTheme`. Use this to specify the default
+        // text styling for headlines, titles, bodies of text, and more.
+        textTheme: const TextTheme(
+          headline1: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
+          headline6: TextStyle(fontSize: 14.0, fontStyle: FontStyle.italic),
+          bodyText2: TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
+        ),
+      ), */
+    );
   }
 }
 
@@ -41,10 +76,10 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   int _selectedIndex = 0;
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  static List<Widget> _widgetOptions = <Widget>[
+  static List<Widget> _widgetOptions = [
     CalendarioCitasScreen(),
     ClientesScreen(),
-    ConfigScreen(),
+    InformesScreen()
   ];
 
   void _onItemTapped(int index) {
@@ -70,12 +105,12 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
             label: 'Clientes',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Config',
+            icon: Icon(Icons.home_repair_service_outlined),
+            label: 'Informes',
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
+        // selectedItemColor: Colors.amber[800],
         onTap: _onItemTapped,
       ),
     );

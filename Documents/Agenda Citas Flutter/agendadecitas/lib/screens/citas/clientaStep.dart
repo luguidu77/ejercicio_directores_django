@@ -2,7 +2,10 @@ import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/providers/cita_list_provider.dart';
 import 'package:agendacitas/providers/db_provider.dart';
 import 'package:agendacitas/providers/my_detail_logic.dart';
+import 'package:agendacitas/screens/citas/servicioStep.dart';
 import 'package:agendacitas/screens/contacs_dialog.dart';
+import 'package:agendacitas/utils/transicion_ruta.dart';
+import 'package:agendacitas/widgets/barra_progreso.dart';
 import 'package:fast_contacts/fast_contacts.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -39,13 +42,9 @@ class _ClientaStepState extends State<ClientaStep> {
   @override
   Widget build(BuildContext context) {
     var clientaElegida = Provider.of<CitaListProvider>(context);
-
     var clienta = clientaElegida.getClientaElegida;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Creación de Cita'),
-      ),
       floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.arrow_right_outlined),
           onPressed: () async => {
@@ -54,7 +53,8 @@ class _ClientaStepState extends State<ClientaStep> {
                     setState(() {
                       seleccionaCliente(context, clientaElegida);
                     }),
-                    Navigator.pushNamed(context, 'servicioStep')
+                    Navigator.of(context)
+                        .push(MyTransicionRuta().createRoute(ServicioStep()))
                   }
               }),
       body: Padding(
@@ -64,7 +64,12 @@ class _ClientaStepState extends State<ClientaStep> {
             key: _formKey,
             child: Column(
               children: [
-                Text(clienta.toString()),
+                //Text(clienta.toString()),
+                BarraProgreso().progreso(
+                  0.33,
+                  Colors.amber.shade900,
+                ),
+                const SizedBox(height: 50),
                 selectClienta(context),
                 const SizedBox(height: 50),
                 selectTelefono(),

@@ -1,6 +1,7 @@
 import 'package:agendacitas/models/cita_model.dart';
 import 'package:agendacitas/providers/cita_list_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class ConfirmarStep extends StatefulWidget {
@@ -26,7 +27,14 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     var servicio = citaElegida.getServicioElegido;
     var citaFechaHora = citaElegida.getCitaElegida;
 
-  //todo: pasar por la clase formater hora y fecha
+    var fecha = DateTime.parse(citaFechaHora['FECHA'])
+            .day
+            .toString()
+            .padLeft(2, '0') +
+        '/' +
+        DateTime.parse(citaFechaHora['FECHA']).month.toString().padLeft(2, '0');
+
+    //todo: pasar por la clase formater hora y fecha
     var textoHoraInicio = DateTime.parse(citaFechaHora['HORAINICIO'].toString())
             .hour
             .toString()
@@ -49,19 +57,85 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
     print(textoHoraInicio);
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text(''),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextButton.icon(
+              onPressed: () => Navigator.pushNamed(context, '/'),
+              icon: const Icon(Icons.cancel_outlined, color: Colors.amber),
+              label:
+                  const Text('Cancelar', style: TextStyle(color: Colors.amber)),
+            ),
+          )
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(88.0),
         child: Column(
           children: [
             Column(
               children: [
-                Text(clienta['NOMBRE']),
-                Text(clienta['TELEFONO']),
-                Text(servicio['SERVICIO']),
-                Text(servicio['PRECIO']),
-                Text(citaFechaHora['FECHA']),
-                Text('hora inicio $textoHoraInicio'),
-                Text('hora inicio $textoHoraFinal'),
+                Row(
+                  children: [
+                    const Icon(Icons.face),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    Text(clienta['NOMBRE']),
+                  ],
+                ),
+                Row(
+                  children: [
+                    const Icon(Icons.phone),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    Text(clienta['TELEFONO']),
+                  ],
+                ),
+                Row(
+                  children: [
+                    const Icon(Icons.design_services),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    Text(servicio['SERVICIO']),
+                  ],
+                ),
+                Row(
+                  children: [
+                    const Icon(Icons.euro),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    Text(servicio['PRECIO']),
+                  ],
+                ),
+                Row(
+                  children: [
+                    const Icon(Icons.date_range_outlined),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    Text(fecha),
+                  ],
+                ),
+                Row(
+                  children: [
+                    const Icon(Icons.watch),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    Column(
+                      children: [
+                        Text(textoHoraInicio),
+                        Text(textoHoraFinal),
+                      ],
+                    ),
+                  ],
+                ),
               ],
             ),
             Expanded(
@@ -79,7 +153,7 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
                               int.parse(clienta['ID'].toString()),
                               int.parse(servicio['ID'].toString()),
                             ),
-                        child: Text('grabar')),
+                        child: const Text('CONFIRMAR CITA')),
               ),
             ),
           ],
@@ -107,6 +181,27 @@ class _ConfirmarStepState extends State<ConfirmarStep> {
       idServicio,
     );
 
-    Navigator.pushNamed(context, '/');
+    //todo: alerta para compartir por whatsapp
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: const Icon(
+                Icons.auto_fix_normal_sharp,
+                color: Colors.red,
+              ),
+              content: const Text('Cita creada correctamente'),
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.pushNamed(context, '/'),
+                    child: const Text('Omitir')),
+                Row(
+                  children: [
+                    TextButton(
+                        onPressed: () {}, child: const Text('Compartir')),
+                  ],
+                )
+              ],
+            ));
+    // Navigator.pushNamed(context, '/');
   }
 }
