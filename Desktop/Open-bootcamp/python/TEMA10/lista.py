@@ -11,24 +11,10 @@ window.config(width=150, padx=50)
 frame = ttk.Frame(window)
 frame.grid(column=0, row=0)
 
-
-
 label = ttk.Label(frame, text='Lista seleccionable:')
 label.grid(column=0, row=0)
-
-
-def imprimeSeleccion(texto):
-   
-
-    print('selecionado: ' + texto)
-
-
-def limpiar():
-    print('limpiado')
-    
    
 lista = ['España', 'Francia', 'Alemania', 'Italia']
-
 lista_item =tkinter.StringVar(value=lista)
 
 
