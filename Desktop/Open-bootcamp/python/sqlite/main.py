@@ -1,8 +1,4 @@
-from pickle import TRUE
 import sqlite3
-import getpass
-import string
-
 
 
 def main():
@@ -15,7 +11,6 @@ def main():
    
     cursor.close()
     conn.close()
-
     agregar_alumnos()
    
    
